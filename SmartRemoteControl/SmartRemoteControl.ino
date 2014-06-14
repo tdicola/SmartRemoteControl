@@ -87,7 +87,7 @@ void loop() {
         }
       }
       // Print code to be sent.
-      Console.print("Sending remote code:");
+      Console.println("Sending remote code:");
       int type_index = command.decode_type > 0 ? command.decode_type - 1 : TYPE_COUNT - 1;
       Console.print("Type: "); Console.println(type_names[type_index]);
       Console.print("Address: "); Console.println(command.panasonicAddress, HEX);
