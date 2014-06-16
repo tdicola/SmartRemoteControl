@@ -27,8 +27,8 @@ def activity(index):
 	# Send all the codes in order that are associated with the activity.
 	for code in activities[index].get('codes', []):
 		console.sendall(code + '\n')
-		# Wait ~40 milliseconds between codes.
-		time.sleep(0.040)
+		# Wait ~500 milliseconds between codes.
+		time.sleep(0.5)
 	console.close()
 	return 'OK'
 
