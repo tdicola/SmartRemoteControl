@@ -31,10 +31,20 @@
         <div class="jumbotron">
           <h1>Smart Remote Control</h1>
         </div>
+        <p>
+          <div class="row">
+            <div class="col-sm-2">
+              <button type="button" class="btn btn-primary btn-block btn-lg" onclick="speak();" >Speak</button>
+            </div>
+            <div class="col-sm-8">
+              <h3 id="speech-status"></h3>
+            </div>
+          </div>
+        </p>
         <div class="row">
           {% for activity in activities %}
           <div class="col-sm-2">
-            <button type="button" class="btn btn-default btn-block btn-lg" onclick="activityClick({{ loop.index - 1 }});">{{ activity.name }}</button>
+            <button type="button" class="btn btn-default btn-block btn-lg" onclick="sendActivity({{ loop.index - 1 }});">{{ activity.name }}</button>
           </div>
           {% endfor %}
         </div>
@@ -42,11 +52,46 @@
       <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
       <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
       <script>
-      function activityClick(index) {
+      var activityList = [
+      {% for activity in activities %}
+        { name: '{{ activity.name }}', index: {{ loop.index - 1 }} } {{ ',' if not loop.last }}
+      {% endfor %}
+      ];
+
+      function sendActivity(index) {
         $.ajax({
           url: '/activity/' + index,
           method: 'POST'
         });
+      }
+
+      function speak() {
+        $('#speech-status').text('Speak activity name...');
+        // Run speech recognition. 
+        var recognition = new webkitSpeechRecognition();
+        recognition.onresult = function(event) {
+          // When a result is available, first grab the transcript.
+          var result = '';
+          for (var i = event.resultIndex; i < event.results.length; ++i) {
+            result += event.results[i][0].transcript;
+          }
+          // Check if transcript matches an activity name.
+          for (var i = 0; i < activityList.length; ++i) {
+            var item = activityList[i];
+            if (item.name.toLowerCase() == result.toLowerCase()) {
+              // Found a match!
+              $('#speech-status').text('Running activity: ' + item.name);
+              sendActivity(item.index);
+              return;
+            }
+          }
+          // Couldn't find a match, so display what was heard.
+          $('#speech-status').text('Heard: ' + result);
+        }
+        recognition.onerror = function(event) {
+          $('#speech-status').text('Error recognizing speech!');
+        }
+        recognition.start();
       }
       </script>
     </body>
