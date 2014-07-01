@@ -29,6 +29,7 @@ def activity(index):
 		console.sendall(code + '\n')
 		# Wait ~500 milliseconds between codes.
 		time.sleep(0.5)
+	console.shutdown(socket.SHUT_RDWR)
 	console.close()
 	return 'OK'
 
